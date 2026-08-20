@@ -15,6 +15,17 @@
                     <flux:sidebar.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
                         {{ __('Dashboard') }}
                     </flux:sidebar.item>
+                    <flux:sidebar.item icon="users" :href="route('patients.index')" :current="request()->routeIs('patients.*')" wire:navigate>
+                        {{ __('Data Pasien') }}
+                    </flux:sidebar.item>
+                    <flux:sidebar.item icon="document-text" :href="route('lab-requests.index')" :current="request()->routeIs('lab-requests.*')" wire:navigate>
+                        {{ __('Pemeriksaan Lab') }}
+                    </flux:sidebar.item>
+                    @if(auth()->user() && auth()->user()->isAdmin())
+                        <flux:sidebar.item icon="user-group" :href="route('users.index')" :current="request()->routeIs('users.*')" wire:navigate>
+                            {{ __('Manajemen User (RBAC)') }}
+                        </flux:sidebar.item>
+                    @endif
                 </flux:sidebar.group>
             </flux:sidebar.nav>
 

@@ -61,6 +61,18 @@ select:focus[data-flux-control] {
     @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
 }
 
-/* \[:where(&)\]:size-4 {
-    @apply size-4;
-} */
+/* Glassmorphism Backdrop Blur for All Modals */
+dialog::backdrop,
+[data-flux-modal] > dialog::backdrop {
+    background-color: rgba(15, 23, 42, 0.55) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+}
+
+.dark dialog::backdrop,
+.dark [data-flux-modal] > dialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.70) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+}
+
