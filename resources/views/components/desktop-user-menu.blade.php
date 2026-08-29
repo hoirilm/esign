@@ -17,10 +17,12 @@
                 <flux:text class="truncate font-mono text-teal-600 font-semibold">{{ auth()->user()->username }}</flux:text>
             </div>
         </div>
+
         <flux:menu.separator />
+
         <flux:menu.radio.group>
             <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>
-                {{ __('Settings') }}
+                {{ __('Pengaturan') }}
             </flux:menu.item>
             <form method="POST" action="{{ route('logout') }}" class="w-full">
                 @csrf
@@ -31,7 +33,7 @@
                     class="w-full cursor-pointer"
                     data-test="logout-button"
                 >
-                    {{ __('Log out') }}
+                    {{ __('Keluar') }}
                 </flux:menu.item>
             </form>
         </flux:menu.radio.group>

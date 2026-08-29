@@ -16,8 +16,8 @@ class PdfController extends Controller
 
         $qrDataUri = null;
         if ($labRequest->verification) {
-            $verificationUrl = route('verify.show', ['qr_token' => $labRequest->verification->qr_token]);
-            $qrDataUri = QrCodeService::generateSvgDataUri($verificationUrl, 140);
+            $plainText = QrCodeService::formatLabRequestPlainText($labRequest);
+            $qrDataUri = QrCodeService::generatePngDataUri($plainText, 180);
         }
 
         $pdf = Pdf::loadView('pdf.lab-report', [

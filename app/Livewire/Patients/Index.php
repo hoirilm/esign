@@ -38,10 +38,23 @@ class Index extends Component
         ];
     }
 
+    public static function generateNextRmNumber(): string
+    {
+        $lastPatient = Patient::latest('id')->first();
+        if (! $lastPatient) {
+            return 'RM-00001';
+        }
+
+        preg_match('/\d+/', $lastPatient->rm_number, $matches);
+        $number = isset($matches[0]) ? ((int)$matches[0] + 1) : ($lastPatient->id + 1);
+
+        return 'RM-' . str_pad((string)$number, 5, '0', STR_PAD_LEFT);
+    }
+
     public function createPatient(): void
     {
         $this->reset(['editingPatientId', 'name', 'identity_number', 'dob', 'address', 'phone']);
-        $this->rm_number = '00' . str_pad((string) (Patient::count() + 1), 4, '0', STR_PAD_LEFT);
+        $this->rm_number = self::generateNextRmNumber();
         $this->gender = 'Perempuan';
         $this->showModal = true;
     }
@@ -70,7 +83,9 @@ class Index extends Component
         if ($this->deletingPatientId) {
             $patient = Patient::findOrFail($this->deletingPatientId);
             $patient->delete();
-            session()->flash('message', 'Data pasien berhasil dihapus.');
+            $msg = 'Data pasien berhasil dihapus.';
+            session()->flash('message', $msg);
+            $this->dispatch('notify', type: 'success', message: $msg);
         }
 
         $this->showDeleteModal = false;
@@ -79,16 +94,23 @@ class Index extends Component
 
     public function save(): void
     {
+        if (! $this->editingPatientId) {
+            $this->rm_number = self::generateNextRmNumber();
+        }
+
         $validated = $this->validate();
 
         if ($this->editingPatientId) {
             $patient = Patient::findOrFail($this->editingPatientId);
             $patient->update($validated);
-            session()->flash('message', 'Data pasien berhasil diperbarui.');
+            $msg = 'Data pasien berhasil diperbarui.';
         } else {
             Patient::create($validated);
-            session()->flash('message', 'Pasien baru berhasil ditambahkan.');
+            $msg = 'Pasien baru berhasil ditambahkan dengan No. RM: ' . $this->rm_number;
         }
+
+        session()->flash('message', $msg);
+        $this->dispatch('notify', type: 'success', message: $msg);
 
         $this->showModal = false;
     }

@@ -42,7 +42,7 @@ class LabRequest extends Model
 
     public function results(): HasMany
     {
-        return $this->hasMany(LabResult::class);
+        return $this->hasMany(LabResult::class)->latest('id');
     }
 
     public function verification(): HasOne

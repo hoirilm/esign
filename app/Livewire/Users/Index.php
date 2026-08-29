@@ -74,9 +74,13 @@ class Index extends Component
         $this->ensureAdmin();
         if ($this->deletingUserId && $this->deletingUserId !== auth()->id()) {
             User::findOrFail($this->deletingUserId)->delete();
-            session()->flash('message', 'Pengguna berhasil dihapus.');
+            $msg = 'Pengguna berhasil dihapus.';
+            session()->flash('message', $msg);
+            $this->dispatch('notify', type: 'success', message: $msg);
         } else {
-            session()->flash('error', 'Tidak dapat menghapus akun Anda sendiri.');
+            $msg = 'Tidak dapat menghapus akun Anda sendiri.';
+            session()->flash('error', $msg);
+            $this->dispatch('notify', type: 'error', message: $msg);
         }
 
         $this->showDeleteModal = false;
@@ -101,7 +105,7 @@ class Index extends Component
                 $updateData['password'] = Hash::make($validated['password']);
             }
             $user->update($updateData);
-            session()->flash('message', 'Role dan data pengguna berhasil diperbarui.');
+            $msg = 'Role dan data pengguna berhasil diperbarui.';
         } else {
             User::create([
                 'username' => $validated['username'],
@@ -110,8 +114,11 @@ class Index extends Component
                 'role' => $validated['role'],
                 'password' => Hash::make($validated['password']),
             ]);
-            session()->flash('message', 'Pengguna baru dengan role ' . strtoupper($validated['role']) . ' berhasil ditambahkan.');
+            $msg = 'Pengguna baru dengan role ' . strtoupper($validated['role']) . ' berhasil ditambahkan.';
         }
+
+        session()->flash('message', $msg);
+        $this->dispatch('notify', type: 'success', message: $msg);
 
         $this->showModal = false;
     }

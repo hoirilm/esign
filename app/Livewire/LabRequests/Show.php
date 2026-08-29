@@ -6,6 +6,7 @@ use App\Models\LabRequest;
 use App\Models\LabResult;
 use App\Models\Verification;
 use App\Services\QrCodeService;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Livewire\Component;
 
@@ -21,11 +22,15 @@ class Show extends Component
     public string $notes = '-';
 
     // Form states for adding test result item
-    public string $category = 'IMUNOLOGI/SEROLOGI';
+    public string $category = 'HEMATOLOGI';
     public string $test_name = '';
     public string $result_value = '';
-    public string $reference_value = 'Negatif';
+    public string $reference_value = '';
     public string $unit = '';
+
+    // Modal & Verification state
+    public bool $showVerifyModal = false;
+    public string $verifyPassword = '';
 
     public ?string $qrDataUri = null;
 
@@ -44,8 +49,8 @@ class Show extends Component
     public function refreshQrCode(): void
     {
         if ($this->labRequest->verification) {
-            $url = route('verify.show', ['qr_token' => $this->labRequest->verification->qr_token]);
-            $this->qrDataUri = QrCodeService::generateSvgDataUri($url, 160);
+            $plainText = QrCodeService::formatLabRequestPlainText($this->labRequest);
+            $this->qrDataUri = QrCodeService::generatePngDataUri($plainText, 180);
         }
     }
 
@@ -59,10 +64,12 @@ class Show extends Component
             'notes' => $this->notes,
         ]);
 
-        session()->flash('message', 'Informasi sampel & petugas berhasil diperbarui.');
+        $msg = 'Informasi sampel & petugas berhasil diperbarui.';
+        session()->flash('message', $msg);
+        $this->dispatch('notify', type: 'success', message: $msg);
     }
 
-    public function addResultItem(): void
+    public function addResult(): void
     {
         $this->validate([
             'category' => 'required|string',
@@ -81,32 +88,92 @@ class Show extends Component
             'unit' => $this->unit,
         ]);
 
-        $this->reset(['test_name', 'result_value', 'unit']);
-        $this->reference_value = 'Negatif';
+        $this->reset(['test_name', 'result_value', 'reference_value', 'unit']);
         $this->labRequest->load('results');
-        session()->flash('item_message', 'Item tes berhasil ditambahkan.');
+
+        $msg = 'Item hasil tes laboratorium berhasil ditambahkan.';
+        session()->flash('message', $msg);
+        $this->dispatch('notify', type: 'success', message: $msg);
     }
 
-    public function deleteResultItem(int $id): void
+    public function addResultItem(): void
+    {
+        $this->addResult();
+    }
+
+    public function removeResult(int $id): void
     {
         if ($this->labRequest->status === 'verified') {
-            session()->flash('error', 'Dokumen yang telah diverifikasi tidak dapat diubah.');
+            $msg = 'Dokumen yang telah diverifikasi TTE tidak dapat diubah.';
+            session()->flash('error', $msg);
+            $this->dispatch('notify', type: 'error', message: $msg);
             return;
         }
 
         LabResult::where('id', $id)->where('lab_request_id', $this->labRequest->id)->delete();
         $this->labRequest->load('results');
+
+        $msg = 'Item hasil uji berhasil dihapus.';
+        session()->flash('message', $msg);
+        $this->dispatch('notify', type: 'success', message: $msg);
+    }
+
+    public function deleteResultItem(int $id): void
+    {
+        $this->removeResult($id);
+    }
+
+    public function openVerifyModal(): void
+    {
+        if (! auth()->user()->isDoctor()) {
+            $msg = 'Hanya akun ber-role Dokter yang dapat melakukan verifikasi TTE.';
+            session()->flash('error', $msg);
+            $this->dispatch('notify', type: 'error', message: $msg);
+            return;
+        }
+
+        if ($this->labRequest->results->count() === 0) {
+            $msg = 'Tidak dapat memverifikasi. Minimal harus ada 1 item hasil lab.';
+            session()->flash('error', $msg);
+            $this->dispatch('notify', type: 'error', message: $msg);
+            return;
+        }
+
+        $this->verifyPassword = '';
+        $this->showVerifyModal = true;
+    }
+
+    public function verifyTte(): void
+    {
+        if (! auth()->user()->isDoctor()) {
+            $msg = 'Hanya akun ber-role Dokter yang dapat melakukan verifikasi TTE.';
+            session()->flash('error', $msg);
+            $this->dispatch('notify', type: 'error', message: $msg);
+            return;
+        }
+
+        if (! Hash::check($this->verifyPassword, auth()->user()->password)) {
+            $this->addError('verifyPassword', 'Password yang Anda masukkan salah.');
+            return;
+        }
+
+        $this->verifyLabRequest();
+        $this->showVerifyModal = false;
     }
 
     public function verifyLabRequest(): void
     {
         if ($this->labRequest->results->count() === 0) {
-            session()->flash('error', 'Tidak dapat memverifikasi. Minimal harus ada 1 item hasil lab.');
+            $msg = 'Tidak dapat memverifikasi. Minimal harus ada 1 item hasil lab.';
+            session()->flash('error', $msg);
+            $this->dispatch('notify', type: 'error', message: $msg);
             return;
         }
 
         if ($this->labRequest->status === 'verified') {
-            session()->flash('message', 'Pemeriksaan ini sudah diverifikasi sebelumnya.');
+            $msg = 'Pemeriksaan ini sudah diverifikasi sebelumnya.';
+            session()->flash('message', $msg);
+            $this->dispatch('notify', type: 'success', message: $msg);
             return;
         }
 
@@ -123,7 +190,9 @@ class Show extends Component
         $this->labRequest->load(['verification.verifier']);
         $this->refreshQrCode();
 
-        session()->flash('message', 'Dokumen Hasil Lab BERHASIL diverifikasi secara elektronik (TTE)! QR Code verifikasi telah terbit.');
+        $msg = 'Dokumen Hasil Lab BERHASIL diverifikasi secara elektronik (TTE)! QR Code verifikasi telah terbit.';
+        session()->flash('message', $msg);
+        $this->dispatch('notify', type: 'success', message: $msg);
     }
 
     public function render()

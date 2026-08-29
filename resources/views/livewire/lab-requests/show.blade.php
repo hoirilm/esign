@@ -1,154 +1,192 @@
 <div class="w-full space-y-6">
-    <!-- Header Navigation & Actions -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs">
-        <div class="flex items-center gap-4">
-            <flux:button variant="ghost" icon="arrow-left" href="{{ route('lab-requests.index') }}" wire:navigate />
-            <div>
-                <div class="flex items-center gap-3">
-                    <h1 class="text-2xl font-bold tracking-tight text-slate-900 font-heading">
-                        Pemeriksaan {{ $labRequest->lab_number }}
-                    </h1>
-                    @if($labRequest->status === 'verified')
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/30">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
-                            </svg>
-                            VERIFIED (TTE)
-                        </span>
-                    @else
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 ring-1 ring-amber-600/30">
-                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                            DRAFT
-                        </span>
-                    @endif
-                </div>
-                <p class="text-xs sm:text-sm text-slate-500 mt-1">
-                    Pasien: <strong class="text-slate-800">{{ $labRequest->patient->name }}</strong> (RM: {{ $labRequest->patient->rm_number }} | NIK: {{ $labRequest->patient->identity_number ?? '-' }})
-                </p>
+    <!-- Header Title & Action -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-zinc-900 p-6 rounded-3xl border border-slate-200/80 dark:border-zinc-800 shadow-md shadow-slate-200/50 dark:shadow-zinc-950/50">
+        <div>
+            <div class="flex items-center gap-3">
+                <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-zinc-100 font-heading">Detail & Hasil Lab #{{ $labRequest->lab_number }}</h1>
+                @if($labRequest->status === 'verified')
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 ring-1 ring-emerald-600/30 dark:ring-emerald-500/40 shadow-2xs">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        VERIFIED (TTE SAH)
+                    </span>
+                @else
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 ring-1 ring-amber-600/30 dark:ring-amber-500/40 shadow-2xs">
+                        <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                        STATUS DRAFT
+                    </span>
+                @endif
             </div>
+            <p class="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1">Lengkapi item hasil pengujian medis dan proses penandatanganan elektronik (TTE).</p>
         </div>
 
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2">
+            <flux:button variant="subtle" icon="arrow-left" href="{{ route('lab-requests.index') }}" wire:navigate>
+                Kembali
+            </flux:button>
             @if($labRequest->status === 'verified')
-                <flux:button variant="primary" icon="arrow-down-tray" href="{{ route('lab-requests.pdf', ['labRequest' => $labRequest->id, 'download' => 1]) }}" target="_blank" class="!bg-teal-700 hover:!bg-teal-800 text-white font-semibold">
+                <flux:button variant="primary" icon="arrow-down-tray" href="{{ route('lab-requests.pdf', ['labRequest' => $labRequest->id, 'download' => 1]) }}" target="_blank" class="!bg-emerald-700 hover:!bg-emerald-800 text-white font-semibold shadow-sm">
                     Cetak / Unduh PDF
-                </flux:button>
-                <flux:button variant="subtle" icon="eye" href="{{ route('lab-requests.pdf', $labRequest->id) }}" target="_blank">
-                    Preview PDF
                 </flux:button>
             @endif
         </div>
     </div>
 
-    <!-- Workflow Progress Stepper UX -->
-    <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs">
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+    <!-- Workflow Progress Tracker -->
+    <div class="bg-white dark:bg-zinc-900 rounded-3xl p-5 border border-slate-200/80 dark:border-zinc-800 shadow-md shadow-slate-200/50 dark:shadow-zinc-950/50">
+        <div class="text-xs font-semibold text-slate-400 dark:text-zinc-500 uppercase tracking-wider mb-4">Progres Alur Pemeriksaan Lab</div>
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 relative">
             <!-- Step 1 -->
-            <div class="flex flex-col items-center space-y-1">
-                <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center text-xs">
-                    ✓
+            <div class="flex items-center gap-3 p-3 rounded-2xl bg-teal-50/80 dark:bg-teal-950/40 border border-teal-200/60 dark:border-teal-800/40 shadow-xs">
+                <div class="w-8 h-8 rounded-xl bg-teal-700 text-white flex items-center justify-center text-xs font-bold shrink-0 shadow-xs">1</div>
+                <div>
+                    <div class="text-xs font-bold text-teal-900 dark:text-teal-200">Registrasi Lab</div>
+                    <div class="text-[11px] text-teal-700 dark:text-teal-400 font-mono">{{ $labRequest->request_date->format('d/m H:i') }}</div>
                 </div>
-                <div class="text-xs font-bold text-slate-900">1. Registrasi Sampel</div>
-                <div class="text-[11px] text-slate-400">Tercatat di sistem</div>
             </div>
 
             <!-- Step 2 -->
-            <div class="flex flex-col items-center space-y-1">
-                <div class="w-8 h-8 rounded-full {{ count($labRequest->results) > 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700' }} font-bold flex items-center justify-center text-xs">
-                    {{ count($labRequest->results) > 0 ? '✓' : '2' }}
+            <div class="flex items-center gap-3 p-3 rounded-2xl {{ $labRequest->results->count() > 0 ? 'bg-teal-50/80 dark:bg-teal-950/40 border border-teal-200/60 dark:border-teal-800/40 shadow-xs' : 'bg-slate-50 dark:bg-zinc-800/40 border border-slate-200/60 dark:border-zinc-700/50 opacity-60' }}">
+                <div class="w-8 h-8 rounded-xl {{ $labRequest->results->count() > 0 ? 'bg-teal-700 text-white' : 'bg-slate-300 dark:bg-zinc-700 text-slate-600 dark:text-zinc-300' }} flex items-center justify-center text-xs font-bold shrink-0 shadow-xs">2</div>
+                <div>
+                    <div class="text-xs font-bold text-slate-900 dark:text-zinc-100">Input Hasil Uji</div>
+                    <div class="text-[11px] text-slate-500 dark:text-zinc-400">{{ $labRequest->results->count() }} item dimasukkan</div>
                 </div>
-                <div class="text-xs font-bold text-slate-900">2. Hasil Uji Lab</div>
-                <div class="text-[11px] text-slate-400">{{ count($labRequest->results) }} item terisi</div>
             </div>
 
             <!-- Step 3 -->
-            <div class="flex flex-col items-center space-y-1">
-                <div class="w-8 h-8 rounded-full {{ $labRequest->status === 'verified' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-400' }} font-bold flex items-center justify-center text-xs">
-                    {{ $labRequest->status === 'verified' ? '✓' : '3' }}
+            <div class="flex items-center gap-3 p-3 rounded-2xl {{ $labRequest->status === 'verified' ? 'bg-emerald-50/80 dark:bg-emerald-950/40 border border-emerald-200/60 dark:border-emerald-800/40 shadow-xs' : 'bg-slate-50 dark:bg-zinc-800/40 border border-slate-200/60 dark:border-zinc-700/50 opacity-60' }}">
+                <div class="w-8 h-8 rounded-xl {{ $labRequest->status === 'verified' ? 'bg-emerald-600 text-white' : 'bg-slate-300 dark:bg-zinc-700 text-slate-600 dark:text-zinc-300' }} flex items-center justify-center text-xs font-bold shrink-0 shadow-xs">3</div>
+                <div>
+                    <div class="text-xs font-bold text-slate-900 dark:text-zinc-100">TTE Dokter</div>
+                    <div class="text-[11px] text-slate-500 dark:text-zinc-400">{{ $labRequest->status === 'verified' ? 'Ditandatangani' : 'Menunggu TTE' }}</div>
                 </div>
-                <div class="text-xs font-bold text-slate-900">3. Verifikasi TTE Dokter</div>
-                <div class="text-[11px] text-slate-400">{{ $labRequest->status === 'verified' ? 'Sah & Valid' : 'Menunggu Otoritas' }}</div>
             </div>
 
             <!-- Step 4 -->
-            <div class="flex flex-col items-center space-y-1">
-                <div class="w-8 h-8 rounded-full {{ $labRequest->status === 'verified' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-400' }} font-bold flex items-center justify-center text-xs">
-                    {{ $labRequest->status === 'verified' ? '✓' : '4' }}
+            <div class="flex items-center gap-3 p-3 rounded-2xl {{ $labRequest->status === 'verified' ? 'bg-emerald-50/80 dark:bg-emerald-950/40 border border-emerald-200/60 dark:border-emerald-800/40 shadow-xs' : 'bg-slate-50 dark:bg-zinc-800/40 border border-slate-200/60 dark:border-zinc-700/50 opacity-60' }}">
+                <div class="w-8 h-8 rounded-xl {{ $labRequest->status === 'verified' ? 'bg-emerald-600 text-white' : 'bg-slate-300 dark:bg-zinc-700 text-slate-600 dark:text-zinc-300' }} flex items-center justify-center text-xs font-bold shrink-0 shadow-xs">4</div>
+                <div>
+                    <div class="text-xs font-bold text-slate-900 dark:text-zinc-100">Siap Cetak PDF</div>
+                    <div class="text-[11px] text-slate-500 dark:text-zinc-400">{{ $labRequest->status === 'verified' ? 'Dokumen Sah' : 'Belum Verifikasi' }}</div>
                 </div>
-                <div class="text-xs font-bold text-slate-900">4. QR Code & Cetak PDF</div>
-                <div class="text-[11px] text-slate-400">{{ $labRequest->status === 'verified' ? 'Siap Diterbitkan' : 'Terkunci' }}</div>
             </div>
         </div>
     </div>
 
-    <!-- Alert Notifications -->
-    @if(session()->has('message'))
-        <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex items-center gap-3">
-            <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            <div class="font-medium">{{ session('message') }}</div>
-        </div>
-    @endif
-
-    @if(session()->has('error'))
-        <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-sm">
-            {{ session('error') }}
-        </div>
-    @endif
-
-    <!-- Main Grid Content -->
+    <!-- Main Grid: Info Pasien & Item Hasil Uji -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Left 2 Columns: Request Meta & Item Results -->
-        <div class="lg:col-span-2 space-y-6">
-            <!-- Metadata Card -->
-            <div class="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
-                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                    <h3 class="text-base font-bold text-slate-900 font-heading">Rincian Dokumen Pemeriksaan</h3>
-                    <span class="text-xs font-mono text-slate-400">Req #: {{ $labRequest->request_number }}</span>
-                </div>
+        <!-- Sidebar Info Pasien & Transaksi -->
+        <div class="space-y-6">
+            <div class="bg-white dark:bg-zinc-900 rounded-3xl border border-slate-200/80 dark:border-zinc-800 p-6 shadow-md shadow-slate-200/50 dark:shadow-zinc-950/50 space-y-4">
+                <h3 class="text-base font-bold text-slate-900 dark:text-zinc-100 font-heading border-b border-slate-100 dark:border-zinc-800 pb-3">Informasi Pasien</h3>
+                
+                <div class="space-y-3 text-sm">
+                    <div>
+                        <div class="text-xs text-slate-400 dark:text-zinc-500 uppercase font-semibold">Nama Lengkap Pasien</div>
+                        <div class="font-bold text-slate-900 dark:text-zinc-100 text-base">{{ $labRequest->patient->name }}</div>
+                    </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm">
-                    <div>
-                        <span class="text-slate-400 block text-xs">Dokter Pengirim:</span>
-                        <strong class="text-slate-800">{{ $labRequest->sender_doctor }}</strong>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <div class="text-xs text-slate-400 dark:text-zinc-500 uppercase font-semibold">No. RM</div>
+                            <div class="font-mono font-bold text-teal-700 dark:text-teal-400 text-sm">{{ $labRequest->patient->rm_number }}</div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-slate-400 dark:text-zinc-500 uppercase font-semibold">NIK</div>
+                            <div class="font-mono text-slate-700 dark:text-zinc-300 text-xs">{{ $labRequest->patient->identity_number ?? '-' }}</div>
+                        </div>
                     </div>
-                    <div>
-                        <span class="text-slate-400 block text-xs">Penanggung Jawab:</span>
-                        <strong class="text-emerald-700 font-semibold">{{ $labRequest->pathologist_doctor }}</strong>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <div class="text-xs text-slate-400 dark:text-zinc-500 uppercase font-semibold">Tgl Lahir / Umur</div>
+                            <div class="text-slate-700 dark:text-zinc-300 text-xs">
+                                {{ $labRequest->patient->dob ? $labRequest->patient->dob->format('d/m/Y') : '-' }}
+                                @if($labRequest->patient->dob)
+                                    <span class="text-slate-400 dark:text-zinc-500">({{ $labRequest->patient->dob->age }} thn)</span>
+                                @endif
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-slate-400 dark:text-zinc-500 uppercase font-semibold">Jenis Kelamin</div>
+                            <div class="text-slate-700 dark:text-zinc-300 text-xs font-semibold">{{ $labRequest->patient->gender }}</div>
+                        </div>
                     </div>
-                    <div>
-                        <span class="text-slate-400 block text-xs">Tanggal Registrasi:</span>
-                        <span class="text-slate-700 font-medium">{{ $labRequest->request_date->format('d M Y, H:i') }} WIB</span>
-                    </div>
-                    <div>
-                        <span class="text-slate-400 block text-xs">Petugas Input / Cetak:</span>
-                        <span class="text-slate-700 font-medium">{{ $labRequest->printed_by }}</span>
+
+                    <div class="border-t border-slate-100 dark:border-zinc-800 pt-3">
+                        <div class="text-xs text-slate-400 dark:text-zinc-500 uppercase font-semibold">Dokter Pengirim</div>
+                        <div class="text-slate-800 dark:text-zinc-200 font-medium text-xs">{{ $labRequest->sender_doctor ?? '-' }}</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Add Result Item Form (If Status Draft) -->
-            @if($labRequest->status === 'draft')
-                <div class="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
-                    <h3 class="text-base font-bold text-slate-900 font-heading">Tambah Item Hasil Uji Lab</h3>
+            <!-- TTE Verification Card / Action -->
+            <div class="bg-white dark:bg-zinc-900 rounded-3xl border border-slate-200/80 dark:border-zinc-800 p-6 shadow-md shadow-slate-200/50 dark:shadow-zinc-950/50 space-y-4">
+                <h3 class="text-base font-bold text-slate-900 dark:text-zinc-100 font-heading border-b border-slate-100 dark:border-zinc-800 pb-3">Status E-Signature (TTE)</h3>
 
-                    <form wire:submit.prevent="addResult" class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
-                        <div class="sm:col-span-3">
-                            <flux:input label="Kategori" wire:model="category" placeholder="IMUNOLOGI/SEROLOGI" required />
+                @if($labRequest->status === 'verified')
+                    <div class="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/50 shadow-xs space-y-3">
+                        <div class="flex items-center gap-3 text-emerald-800 dark:text-emerald-300 font-bold text-sm">
+                            <svg class="w-6 h-6 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                            </svg>
+                            TTE Verifikasi Berhasil
                         </div>
-                        <div class="sm:col-span-3">
-                            <flux:input label="Nama Parameter Uji" wire:model="test_name" placeholder="Salmonella Typhi O" required />
+                        <div class="text-xs text-emerald-900 dark:text-emerald-200 space-y-1.5">
+                            <div><strong>Penandatangan:</strong> {{ $labRequest->verification->verifier->name ?? 'Dokter Penanggung Jawab' }}</div>
+                            <div><strong>Waktu TTE:</strong> {{ $labRequest->verification?->verified_at ? $labRequest->verification->verified_at->format('d/m/Y H:i:s') : '-' }} WIB</div>
+                            <div class="font-mono text-[11px] break-all text-emerald-700 dark:text-emerald-400 pt-1 border-t border-emerald-200/60 dark:border-emerald-800/40 mt-1">
+                                <strong>HASH SHA-256:</strong> {{ strtoupper(substr(hash('sha256', ($labRequest->verification?->qr_token ?? '') . $labRequest->id), 0, 32)) }}...
+                            </div>
+                        </div>
+                    </div>
+                @else
+                    <p class="text-xs text-slate-500 dark:text-zinc-400">Dokumen masih berstatus <strong>DRAFT</strong>. Dokter Penanggung Jawab harus melakukan verifikasi TTE agar dokumen sah dan dapat dicetak.</p>
+
+                    @if(auth()->user()->isDoctor())
+                        <flux:button variant="primary" icon="shield-check" wire:click="openVerifyModal" class="w-full !bg-emerald-700 hover:!bg-emerald-800 text-white font-bold py-2.5 shadow-sm">
+                            Tanda Tangani & Verifikasi (TTE)
+                        </flux:button>
+                    @else
+                        <div class="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/50 text-amber-800 dark:text-amber-300 text-xs shadow-2xs">
+                            Hanya akun ber-role <strong>Dokter</strong> yang dapat melakukan verifikasi TTE.
+                        </div>
+                    @endif
+                @endif
+            </div>
+        </div>
+
+        <!-- Detail Results Table & Add Form -->
+        <div class="lg:col-span-2 space-y-6">
+            @if($labRequest->status === 'draft')
+                <!-- Form Input Parameter Hasil Uji -->
+                <div class="bg-white dark:bg-zinc-900 rounded-3xl border border-slate-200/80 dark:border-zinc-800 p-6 shadow-md shadow-slate-200/50 dark:shadow-zinc-950/50 space-y-4">
+                    <h3 class="text-base font-bold text-slate-900 dark:text-zinc-100 font-heading border-b border-slate-100 dark:border-zinc-800 pb-3">Input Parameter Hasil Uji</h3>
+
+                    <form wire:submit="addResult" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 dark:text-zinc-400 mb-1">Kategori Pemeriksaan</label>
+                            <flux:input wire:model="category" placeholder="HEMATOLOGI" required />
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 dark:text-zinc-400 mb-1">Nama Pemeriksaan / Test Name</label>
+                            <flux:input wire:model="test_name" placeholder="Hemoglobin (Hb)" required />
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 dark:text-zinc-400 mb-1">Nilai Hasil Uji</label>
+                            <flux:input wire:model="result_value" placeholder="14.2" required />
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 dark:text-zinc-400 mb-1">Nilai Rujukan / Normal</label>
+                            <flux:input wire:model="reference_value" placeholder="13.0 - 17.0" />
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 dark:text-zinc-400 mb-1">Satuan</label>
+                            <flux:input wire:model="unit" placeholder="g/dL" />
                         </div>
                         <div class="sm:col-span-2">
-                            <flux:input label="Hasil" wire:model="result_value" placeholder="POSITIF 1/80" required />
-                        </div>
-                        <div class="sm:col-span-2">
-                            <flux:input label="Nilai Rujukan" wire:model="reference_value" placeholder="Negatif" />
-                        </div>
-                        <div class="sm:col-span-2">
-                            <flux:button variant="primary" type="submit" icon="plus" class="w-full !bg-teal-700 hover:!bg-teal-800 text-white font-semibold">
-                                Tambah
+                            <flux:button variant="primary" type="submit" icon="plus" class="w-full !bg-teal-700 hover:!bg-teal-800 text-white font-semibold shadow-sm">
+                                Tambah Item Hasil Uji
                             </flux:button>
                         </div>
                     </form>
@@ -156,40 +194,40 @@
             @endif
 
             <!-- Results Table Card -->
-            <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
-                <div class="p-5 border-b border-slate-100">
-                    <h3 class="text-base font-bold text-slate-900 font-heading">Tabel Hasil Pemeriksaan Laboratorium</h3>
-                    <p class="text-xs text-slate-500">Daftar item parameter medis yang akan dicetak pada laporan hasil lab.</p>
+            <div class="bg-white dark:bg-zinc-900 rounded-3xl border border-slate-200/80 dark:border-zinc-800 shadow-md shadow-slate-200/50 dark:shadow-zinc-950/50 overflow-hidden">
+                <div class="p-5 border-b border-slate-100 dark:border-zinc-800">
+                    <h3 class="text-base font-bold text-slate-900 dark:text-zinc-100 font-heading">Tabel Hasil Pemeriksaan Laboratorium</h3>
+                    <p class="text-xs text-slate-500 dark:text-zinc-400">Daftar item parameter medis yang akan dicetak pada laporan hasil lab.</p>
                 </div>
 
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm text-slate-600 table-fixed">
-                        <thead class="bg-slate-50/80 text-[11px] uppercase font-bold tracking-wider text-slate-500 border-b border-slate-200/80">
+                    <table class="w-full text-left text-sm text-slate-600 dark:text-zinc-300 table-fixed">
+                        <thead class="bg-slate-50/80 dark:bg-zinc-800/80 text-[11px] uppercase font-bold tracking-wider text-slate-500 dark:text-zinc-400 border-b border-slate-200/80 dark:border-zinc-800">
                             <tr>
-                                <th class="px-5 py-3.5 w-[24%]">Kategori</th>
-                                <th class="px-5 py-3.5 w-[32%]">Pemeriksaan</th>
-                                <th class="px-5 py-3.5 w-[20%]">Hasil</th>
-                                <th class="px-5 py-3.5 w-[12%]">Nilai Rujukan</th>
-                                <th class="px-5 py-3.5 w-[7%]">Satuan</th>
+                                <th class="px-3 py-3.5 {{ $labRequest->status === 'draft' ? 'w-[18%]' : 'w-[20%]' }} whitespace-nowrap">Kategori</th>
+                                <th class="px-3 py-3.5 {{ $labRequest->status === 'draft' ? 'w-[26%]' : 'w-[30%]' }} whitespace-nowrap">Pemeriksaan</th>
+                                <th class="px-3 py-3.5 {{ $labRequest->status === 'draft' ? 'w-[15%]' : 'w-[18%]' }} whitespace-nowrap">Hasil</th>
+                                <th class="px-3 py-3.5 {{ $labRequest->status === 'draft' ? 'w-[22%]' : 'w-[22%]' }} whitespace-nowrap">Nilai Rujukan</th>
+                                <th class="px-3 py-3.5 {{ $labRequest->status === 'draft' ? 'w-[11%]' : 'w-[10%]' }} whitespace-nowrap">Satuan</th>
                                 @if($labRequest->status === 'draft')
-                                    <th class="px-5 py-3.5 w-[5%] text-right">Aksi</th>
+                                    <th class="px-3 py-3.5 w-[8%] text-right whitespace-nowrap">Aksi</th>
                                 @endif
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-100">
+                        <tbody class="divide-y divide-slate-100 dark:divide-zinc-800">
                             @forelse($labRequest->results as $res)
-                                <tr class="hover:bg-slate-50/70 transition-colors">
-                                    <td class="px-5 py-3.5 text-xs text-slate-400 uppercase font-semibold truncate">{{ $res->category }}</td>
-                                    <td class="px-5 py-3.5 font-medium text-slate-900 truncate">{{ $res->test_name }}</td>
-                                    <td class="px-5 py-3.5 font-bold truncate {{ Str::contains(strtoupper($res->result_value), ['POSITIF', 'HIGH']) ? 'text-rose-600' : 'text-emerald-700' }}">
+                                <tr class="hover:bg-slate-50/70 dark:hover:bg-zinc-800/50 transition-colors">
+                                    <td class="px-3 py-3.5 text-xs text-slate-400 dark:text-zinc-500 uppercase font-semibold truncate">{{ $res->category }}</td>
+                                    <td class="px-3 py-3.5 font-medium text-slate-900 dark:text-zinc-100 truncate">{{ $res->test_name }}</td>
+                                    <td class="px-3 py-3.5 font-bold truncate {{ Str::contains(strtoupper($res->result_value), ['POSITIF', 'HIGH']) ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-700 dark:text-emerald-400' }}">
                                         {{ $res->result_value }}
                                     </td>
-                                    <td class="px-5 py-3.5 text-xs text-slate-500 truncate">{{ $res->reference_value ?? '-' }}</td>
-                                    <td class="px-5 py-3.5 text-xs text-slate-500 truncate">{{ $res->unit ?? '-' }}</td>
+                                    <td class="px-3 py-3.5 text-xs text-slate-500 dark:text-zinc-400 truncate">{{ $res->reference_value ?? '-' }}</td>
+                                    <td class="px-3 py-3.5 text-xs text-slate-500 dark:text-zinc-400 truncate">{{ $res->unit ?? '-' }}</td>
                                     @if($labRequest->status === 'draft')
-                                        <td class="px-5 py-3.5 text-right">
+                                        <td class="px-3 py-3.5 text-right">
                                             <flux:dropdown position="bottom" align="end">
-                                                <flux:button variant="ghost" size="sm" icon="ellipsis-vertical" class="!w-8 !h-8 !p-0 rounded-xl hover:bg-slate-100 text-slate-500 hover:text-slate-900" />
+                                                <flux:button variant="ghost" size="sm" icon="ellipsis-vertical" class="!w-8 !h-8 !p-0 rounded-xl hover:bg-slate-100 dark:hover:bg-zinc-800 text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-100" />
                                                 <flux:menu>
                                                     <flux:menu.item icon="trash" variant="danger" wire:click="removeResult({{ $res->id }})">
                                                         Hapus Item
@@ -201,7 +239,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="px-5 py-8 text-center text-slate-400 text-sm">
+                                    <td colspan="6" class="px-5 py-8 text-center text-slate-400 dark:text-zinc-500 text-sm">
                                         Belum ada parameter uji ditambahkan.
                                     </td>
                                 </tr>
@@ -211,76 +249,31 @@
                 </div>
             </div>
         </div>
-
-        <!-- Right 1 Column: Status TTE & QR Verification Card -->
-        <div class="space-y-6">
-            <div class="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-5 sticky top-6">
-                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                    <h3 class="text-base font-bold text-slate-900 font-heading">Status Tanda Tangan Elektronik</h3>
-                    <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                    </svg>
-                </div>
-
-                @if($labRequest->verification)
-                    <div class="p-5 rounded-2xl bg-emerald-50/80 border border-emerald-200 space-y-4 text-center">
-                        <div class="inline-flex items-center justify-center p-3 bg-white rounded-2xl shadow-sm border border-emerald-100 mx-auto">
-                            @if($qrDataUri)
-                                <img src="{{ $qrDataUri }}" class="w-40 h-40" alt="QR Code Verification">
-                            @endif
-                        </div>
-                        
-                        <div>
-                            <div class="text-[11px] text-emerald-700 font-bold uppercase tracking-wider">TTE Valid & Terverifikasi</div>
-                            <div class="text-base font-bold text-slate-900 mt-1 font-heading">
-                                {{ $labRequest->verification->verifier->name }}
-                            </div>
-                            <div class="text-xs text-slate-500 mt-0.5">
-                                {{ $labRequest->verification->verified_at->format('d M Y, H:i:s') }} WIB
-                            </div>
-                        </div>
-
-                        <div class="pt-3 border-t border-emerald-200/60">
-                            <a href="{{ route('verify.show', $labRequest->verification->qr_token) }}" target="_blank" class="inline-flex items-center gap-1.5 text-xs font-semibold text-teal-700 hover:text-teal-800 underline">
-                                <span>Buka Halaman Scan Publik</span>
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                                </svg>
-                            </a>
-                        </div>
-                    </div>
-                @else
-                    <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-4">
-                        <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-700 border border-amber-200 flex items-center justify-center mx-auto">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <div class="text-sm font-bold text-slate-800 font-heading">Status Masih Draft</div>
-                            <p class="text-xs text-slate-500 mt-1">
-                                Dokumen ini memerlukan verifikasi dari Dokter Penanggung Jawab untuk menerbitkan Tanda Tangan Elektronik & QR Code sah.
-                            </p>
-                        </div>
-
-                        <flux:button variant="primary" icon="check-badge" class="w-full !bg-emerald-700 hover:!bg-emerald-800 text-white font-bold py-2.5" wire:click="verifyLabRequest">
-                            Verifikasi & Terbitkan TTE
-                        </flux:button>
-                    </div>
-                @endif
-
-                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs text-slate-500 space-y-2">
-                    <div class="font-bold text-slate-700 flex items-center gap-1.5">
-                        <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        Landasan Hukum TTE
-                    </div>
-                    <p class="text-[11px] leading-relaxed">
-                        Sesuai Pasal 11 UU No. 11/2008 tentang ITE, Tanda Tangan Elektronik pada hasil pemeriksaan medis ini diakui secara legal dan sah secara hukum.
-                    </p>
-                </div>
-            </div>
-        </div>
     </div>
+
+    <!-- Modal Konfirmasi TTE -->
+    <flux:modal wire:model="showVerifyModal" class="space-y-6">
+        <div class="border-b border-slate-100 dark:border-zinc-800 pb-4">
+            <flux:heading size="lg" class="text-emerald-700 dark:text-emerald-400 font-heading">Verifikasi & Tanda Tangan Digital (TTE)</flux:heading>
+            <flux:subheading>Konfirmasi penerbitan TTE sah untuk laporan hasil laboratorium medis ini.</flux:subheading>
+        </div>
+
+        <div class="p-3.5 rounded-2xl bg-emerald-50/80 dark:bg-emerald-950/40 border border-emerald-200/60 dark:border-emerald-800/40 text-emerald-900 dark:text-emerald-200 text-xs flex items-center gap-2.5 shadow-2xs">
+            <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+            <span>Penandatangan TTE: <strong>{{ auth()->user()->name }}</strong> (Username: <span class="font-mono text-emerald-700 dark:text-emerald-400">{{ auth()->user()->username }}</span>)</span>
+        </div>
+
+        <div class="space-y-4">
+            <flux:input type="password" label="Masukkan Password Akun Anda" wire:model="verifyPassword" placeholder="Masukkan password Anda untuk konfirmasi TTE..." required />
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-zinc-800">
+            <flux:button variant="ghost" wire:click="$set('showVerifyModal', false)">Batal</flux:button>
+            <flux:button variant="primary" wire:click="verifyTte" class="!bg-emerald-700 hover:!bg-emerald-800 text-white font-semibold shadow-sm">
+                Tanda Tangani TTE Sekarang
+            </flux:button>
+        </div>
+    </flux:modal>
 </div>
