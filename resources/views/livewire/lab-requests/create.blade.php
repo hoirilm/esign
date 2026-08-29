@@ -1,48 +1,85 @@
-<div class="max-w-3xl mx-auto p-6 space-y-6">
+<div class="w-full space-y-6">
     <div class="flex items-center gap-4">
         <flux:button variant="ghost" icon="arrow-left" href="{{ route('lab-requests.index') }}" wire:navigate />
         <div>
-            <h1 class="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">Registrasi Pemeriksaan Lab Baru</h1>
-            <p class="text-sm text-zinc-500 dark:text-zinc-400">Pilih pasien dan isi data lengkap pengajuan laboratorium.</p>
+            <h1 class="text-2xl font-bold tracking-tight text-slate-900 font-heading">Registrasi Pemeriksaan Baru</h1>
+            <p class="text-xs sm:text-sm text-slate-500">Pilih pasien dan lengkapi rincian permintaan pemeriksaan lab.</p>
         </div>
     </div>
 
-    <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-2xl p-6 shadow-sm space-y-5">
-        <div class="space-y-1">
-            <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Pilih Pasien Terdaftar</label>
-            <select wire:model="patient_id" class="w-full rounded-lg border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 p-2.5 text-sm focus:ring-teal-500 focus:border-teal-500">
+    @if(session()->has('error'))
+        <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-sm">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    <form wire:submit.prevent="save" class="space-y-6">
+        <!-- Section 1: Pasien -->
+        <div class="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+                <div class="w-8 h-8 rounded-full bg-teal-100 text-teal-800 font-bold flex items-center justify-center text-xs">1</div>
+                <div>
+                    <h3 class="text-base font-bold text-slate-900 font-heading">Identitas Pasien</h3>
+                    <p class="text-xs text-slate-500">Pilih data pasien terdaftar atau daftarkan pasien baru terlebih dahulu.</p>
+                </div>
+            </div>
+
+            <flux:select label="Pilih Pasien Terdaftar" wire:model="patient_id" required class="w-full">
                 <option value="">-- Pilih Pasien --</option>
                 @foreach($patients as $patient)
                     <option value="{{ $patient->id }}">{{ $patient->name }} (RM: {{ $patient->rm_number }} | NIK: {{ $patient->identity_number ?? '-' }})</option>
                 @endforeach
-            </select>
-            @error('patient_id') <span class="text-xs text-rose-500">{{ $message }}</span> @enderror
+            </flux:select>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <flux:input label="Nomor Laboratorium (No. Lab)" wire:model="lab_number" />
-            <flux:input label="Nomor Permintaan (No. Permintaan)" wire:model="request_number" />
+        <!-- Section 2: Informasi Pemeriksaan & Nomor Lab -->
+        <div class="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+                <div class="w-8 h-8 rounded-full bg-teal-100 text-teal-800 font-bold flex items-center justify-center text-xs">2</div>
+                <div>
+                    <h3 class="text-base font-bold text-slate-900 font-heading">Informasi & Nomor Registrasi</h3>
+                    <p class="text-xs text-slate-500">Nomor laboratorium dan nomor pengajuan dibuat otomatis oleh sistem.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <flux:input label="Nomor Laboratorium" wire:model="lab_number" required />
+                <flux:input label="Nomor Pengajuan (Permintaan)" wire:model="request_number" required />
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <flux:input type="datetime-local" label="Tanggal / Waktu Registrasi" wire:model="request_date" required />
+                <flux:input type="datetime-local" label="Tanggal / Waktu Ambil Sampel" wire:model="specimen_date" required />
+            </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <flux:input type="datetime-local" label="Tgl/Jam Registrasi & Permintaan" wire:model="request_date" />
-            <flux:input type="datetime-local" label="Tgl/Jam Spesimen" wire:model="specimen_date" />
-            <flux:input type="datetime-local" label="Tgl/Jam Selesai / Cetak" wire:model="finished_date" />
+        <!-- Section 3: Dokter & Petugas -->
+        <div class="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+                <div class="w-8 h-8 rounded-full bg-teal-100 text-teal-800 font-bold flex items-center justify-center text-xs">3</div>
+                <div>
+                    <h3 class="text-base font-bold text-slate-900 font-heading">Dokter & Petugas Lab</h3>
+                    <p class="text-xs text-slate-500">Informasi dokter pengirim dan dokter penanggung jawab patologi klinik.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <flux:input label="Dokter Pengirim" wire:model="sender_doctor" placeholder="APS . (Atas Permintaan Sendiri)" required />
+                <flux:input label="Penanggung Jawab" wire:model="pathologist_doctor" placeholder="dr. Kristin Indriana" required />
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <flux:input label="Petugas Cetak / Input" wire:model="printed_by" placeholder="Taufiqurrohman" required />
+                <flux:input label="Catatan Tambahan" wire:model="notes" placeholder="Contoh: Puasa 8 jam" />
+            </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <flux:input label="Dokter Pengirim / Perujuk" wire:model="sender_doctor" placeholder="APS . (Atas Permintaan Sendiri)" />
-            <flux:input label="Penanggung Jawab / Clinical Pathologist" wire:model="pathologist_doctor" placeholder="dr. Kristin Indriana" />
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <flux:input label="Dicetak oleh (Petugas)" wire:model="printed_by" placeholder="Taufiqurrohman" />
-            <flux:input label="Catatan Laboratorium" wire:model="notes" placeholder="-" />
-        </div>
-
-        <div class="flex justify-end gap-3 pt-4 border-t border-zinc-200 dark:border-zinc-800">
+        <!-- Submit Button -->
+        <div class="flex justify-end gap-3 pt-2">
             <flux:button variant="ghost" href="{{ route('lab-requests.index') }}" wire:navigate>Batal</flux:button>
-            <flux:button variant="primary" wire:click="save">Lanjutkan Ke Input Hasil</flux:button>
+            <flux:button variant="primary" type="submit" class="!bg-teal-700 hover:!bg-teal-800 text-white font-bold px-6">
+                Lanjutkan & Input Hasil Uji
+            </flux:button>
         </div>
-    </div>
+    </form>
 </div>

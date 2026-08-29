@@ -18,31 +18,34 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
-        // 1. Users
+        // 1. Users (Admin username: admin, password: admin)
+        $admin = User::firstOrCreate(
+            ['username' => 'admin'],
+            [
+                'name' => 'Administrator',
+                'email' => 'admin@lab.com',
+                'password' => Hash::make('admin'),
+                'role' => 'admin',
+            ]
+        );
+
         $doctor = User::firstOrCreate(
-            ['email' => 'dokter@lab.com'],
+            ['username' => 'dokter'],
             [
                 'name' => 'dr. Kristin Indriana',
+                'email' => 'dokter@lab.com',
                 'password' => Hash::make('password'),
                 'role' => 'doctor',
             ]
         );
 
         $staff = User::firstOrCreate(
-            ['email' => 'petugas@lab.com'],
+            ['username' => 'petugas'],
             [
                 'name' => 'Taufiqurrohman',
+                'email' => 'petugas@lab.com',
                 'password' => Hash::make('password'),
                 'role' => 'staff',
-            ]
-        );
-
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@lab.com'],
-            [
-                'name' => 'Administrator',
-                'password' => Hash::make('password'),
-                'role' => 'admin',
             ]
         );
 

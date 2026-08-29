@@ -19,6 +19,7 @@ class Index extends Component
     public ?int $editingUserId = null;
     public ?int $deletingUserId = null;
 
+    public string $username = '';
     public string $name = '';
     public string $email = '';
     public string $password = '';
@@ -34,9 +35,9 @@ class Index extends Component
     protected function rules(): array
     {
         return [
+            'username' => 'required|string|alpha_dash|unique:users,username,' . $this->editingUserId,
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $this->editingUserId,
-            'password' => $this->editingUserId ? 'nullable|min:6' : 'required|min:6',
+            'password' => $this->editingUserId ? 'nullable|min:4' : 'required|min:4',
             'role' => 'required|in:admin,doctor,staff',
         ];
     }
@@ -44,7 +45,7 @@ class Index extends Component
     public function createUser(): void
     {
         $this->ensureAdmin();
-        $this->reset(['editingUserId', 'name', 'email', 'password']);
+        $this->reset(['editingUserId', 'username', 'name', 'email', 'password']);
         $this->role = 'staff';
         $this->showModal = true;
     }
@@ -53,8 +54,9 @@ class Index extends Component
     {
         $this->ensureAdmin();
         $this->editingUserId = $user->id;
+        $this->username = $user->username ?? '';
         $this->name = $user->name;
-        $this->email = $user->email;
+        $this->email = $user->email ?? ($user->username . '@lab.com');
         $this->password = '';
         $this->role = $user->role ?? 'staff';
         $this->showModal = true;
@@ -85,12 +87,14 @@ class Index extends Component
     {
         $this->ensureAdmin();
         $validated = $this->validate();
+        $generatedEmail = strtolower($validated['username']) . '@lab.com';
 
         if ($this->editingUserId) {
             $user = User::findOrFail($this->editingUserId);
             $updateData = [
+                'username' => $validated['username'],
                 'name' => $validated['name'],
-                'email' => $validated['email'],
+                'email' => $generatedEmail,
                 'role' => $validated['role'],
             ];
             if (!empty($validated['password'])) {
@@ -100,8 +104,9 @@ class Index extends Component
             session()->flash('message', 'Role dan data pengguna berhasil diperbarui.');
         } else {
             User::create([
+                'username' => $validated['username'],
                 'name' => $validated['name'],
-                'email' => $validated['email'],
+                'email' => $generatedEmail,
                 'role' => $validated['role'],
                 'password' => Hash::make($validated['password']),
             ]);
@@ -122,8 +127,8 @@ class Index extends Component
     {
         $users = User::query()
             ->when($this->search, function ($query) {
-                $query->where('name', 'like', '%' . $this->search . '%')
-                    ->orWhere('email', 'like', '%' . $this->search . '%')
+                $query->where('username', 'like', '%' . $this->search . '%')
+                    ->orWhere('name', 'like', '%' . $this->search . '%')
                     ->orWhere('role', 'like', '%' . $this->search . '%');
             })
             ->latest()
