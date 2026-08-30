@@ -70,8 +70,8 @@
 
         <!-- Submit Button -->
         <div class="flex justify-end gap-3 pt-2">
-            <flux:button variant="ghost" href="{{ route('lab-requests.index') }}" wire:navigate>Batal</flux:button>
-            <flux:button variant="primary" type="submit" class="!bg-teal-700 hover:!bg-teal-800 text-white font-bold px-6 shadow-sm">
+            <flux:button variant="ghost" href="{{ route('lab-requests.index') }}" wire:navigate class="!rounded-xl">Batal</flux:button>
+            <flux:button variant="primary" type="submit" class="!bg-gradient-to-r !from-teal-600 !to-teal-500 hover:!from-teal-500 hover:!to-teal-400 !text-white font-bold !border-none shadow-lg shadow-teal-700/20 !rounded-xl active:scale-[0.99] transition-all cursor-pointer px-6">
                 Lanjutkan & Input Hasil Uji
             </flux:button>
         </div>

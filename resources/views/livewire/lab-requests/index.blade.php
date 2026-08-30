@@ -1,11 +1,11 @@
 <div class="w-full space-y-6">
     <!-- Header Title & Action -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-zinc-900 p-6 rounded-3xl border border-slate-200/80 dark:border-zinc-800 shadow-md shadow-slate-200/50 dark:shadow-zinc-950/50">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-zinc-900 p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-zinc-800 shadow-xl shadow-slate-200/50 dark:shadow-zinc-950/50">
         <div>
-            <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-zinc-100 font-heading">Pemeriksaan & Hasil Laboratorium</h1>
-            <p class="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-0.5">Daftar pengajuan pemeriksaan, pengisian hasil uji, serta verifikasi TTE.</p>
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-zinc-100 font-heading">Pemeriksaan & Hasil Laboratorium</h1>
+            <p class="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1">Daftar pengajuan pemeriksaan, pengisian hasil uji, serta verifikasi TTE.</p>
         </div>
-        <flux:button variant="primary" icon="plus" href="{{ route('lab-requests.create') }}" wire:navigate class="!bg-teal-700 hover:!bg-teal-800 text-white font-semibold shadow-sm">
+        <flux:button variant="primary" icon="plus" href="{{ route('lab-requests.create') }}" wire:navigate class="!bg-gradient-to-r !from-teal-600 !to-teal-500 hover:!from-teal-500 hover:!to-teal-400 !text-white font-bold !border-none shadow-lg shadow-teal-700/20 !rounded-xl active:scale-[0.99] transition-all cursor-pointer shrink-0">
             Pemeriksaan Baru
         </flux:button>
     </div>
@@ -17,13 +17,13 @@
         </div>
 
         <div class="flex items-center gap-2">
-            <flux:button size="sm" variant="{{ $statusFilter === '' ? 'primary' : 'subtle' }}" wire:click="$set('statusFilter', '')" class="{{ $statusFilter === '' ? '!bg-teal-700 text-white' : '' }}">
+            <flux:button size="sm" variant="{{ $statusFilter === '' ? 'primary' : 'subtle' }}" wire:click="$set('statusFilter', '')" class="{{ $statusFilter === '' ? '!bg-teal-600 text-white font-bold !rounded-xl' : '!rounded-xl' }}">
                 Semua
             </flux:button>
-            <flux:button size="sm" variant="{{ $statusFilter === 'verified' ? 'primary' : 'subtle' }}" wire:click="$set('statusFilter', 'verified')" class="{{ $statusFilter === 'verified' ? '!bg-emerald-700 text-white' : '' }}">
+            <flux:button size="sm" variant="{{ $statusFilter === 'verified' ? 'primary' : 'subtle' }}" wire:click="$set('statusFilter', 'verified')" class="{{ $statusFilter === 'verified' ? '!bg-emerald-600 text-white font-bold !rounded-xl' : '!rounded-xl' }}">
                 Verified (TTE)
             </flux:button>
-            <flux:button size="sm" variant="{{ $statusFilter === 'draft' ? 'primary' : 'subtle' }}" wire:click="$set('statusFilter', 'draft')" class="{{ $statusFilter === 'draft' ? '!bg-amber-600 text-white' : '' }}">
+            <flux:button size="sm" variant="{{ $statusFilter === 'draft' ? 'primary' : 'subtle' }}" wire:click="$set('statusFilter', 'draft')" class="{{ $statusFilter === 'draft' ? '!bg-amber-600 text-white font-bold !rounded-xl' : '!rounded-xl' }}">
                 Draft
             </flux:button>
         </div>

@@ -1,12 +1,12 @@
 <div class="w-full space-y-6">
     <!-- Header Title & Action -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-zinc-900 p-6 rounded-3xl border border-slate-200/80 dark:border-zinc-800 shadow-md shadow-slate-200/50 dark:shadow-zinc-950/50">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-zinc-900 p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-zinc-800 shadow-xl shadow-slate-200/50 dark:shadow-zinc-950/50">
         <div>
-            <div class="flex items-center gap-3">
-                <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-zinc-100 font-heading">Detail & Hasil Lab #{{ $labRequest->lab_number }}</h1>
+            <div class="flex items-center gap-3 flex-wrap">
+                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-zinc-100 font-heading">Detail & Hasil Lab #{{ $labRequest->lab_number }}</h1>
                 @if($labRequest->status === 'verified')
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 ring-1 ring-emerald-600/30 dark:ring-emerald-500/40 shadow-2xs">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                         VERIFIED (TTE SAH)
                     </span>
                 @else
@@ -19,12 +19,12 @@
             <p class="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1">Lengkapi item hasil pengujian medis dan proses penandatanganan elektronik (TTE).</p>
         </div>
 
-        <div class="flex items-center gap-2">
-            <flux:button variant="subtle" icon="arrow-left" href="{{ route('lab-requests.index') }}" wire:navigate>
+        <div class="flex items-center gap-2 shrink-0">
+            <flux:button variant="subtle" icon="arrow-left" href="{{ route('lab-requests.index') }}" wire:navigate class="!rounded-xl">
                 Kembali
             </flux:button>
             @if($labRequest->status === 'verified')
-                <flux:button variant="primary" icon="arrow-down-tray" href="{{ route('lab-requests.pdf', ['labRequest' => $labRequest->id, 'download' => 1]) }}" target="_blank" class="!bg-emerald-700 hover:!bg-emerald-800 text-white font-semibold shadow-sm">
+                <flux:button variant="primary" icon="arrow-down-tray" href="{{ route('lab-requests.pdf', ['labRequest' => $labRequest->id, 'download' => 1]) }}" target="_blank" class="!bg-gradient-to-r !from-emerald-600 !to-teal-600 hover:!from-emerald-500 hover:!to-teal-500 text-white font-bold !border-none shadow-lg shadow-emerald-700/20 !rounded-xl active:scale-[0.99] transition-all cursor-pointer">
                     Cetak / Unduh PDF
                 </flux:button>
             @endif

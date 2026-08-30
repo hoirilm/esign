@@ -1,11 +1,11 @@
 <div class="w-full space-y-6">
     <!-- Header Title & Action -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-zinc-900 p-6 rounded-3xl border border-slate-200/80 dark:border-zinc-800 shadow-md shadow-slate-200/50 dark:shadow-zinc-950/50">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-zinc-900 p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-zinc-800 shadow-xl shadow-slate-200/50 dark:shadow-zinc-950/50">
         <div>
-            <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-zinc-100 font-heading">Manajemen Pengguna & Role (RBAC)</h1>
-            <p class="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-0.5">Kelola akun dan hak akses otoritas aplikasi (Dokter, Staff Lab, Administrator).</p>
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-zinc-100 font-heading">Manajemen Pengguna & Role (RBAC)</h1>
+            <p class="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1">Kelola akun dan hak akses otoritas aplikasi (Dokter, Staff Lab, Administrator).</p>
         </div>
-        <flux:button variant="primary" icon="user-plus" wire:click="createUser" class="!bg-teal-700 hover:!bg-teal-800 text-white font-semibold shadow-sm">
+        <flux:button variant="primary" icon="user-plus" wire:click="createUser" class="!bg-gradient-to-r !from-teal-600 !to-teal-500 hover:!from-teal-500 hover:!to-teal-400 !text-white font-bold !border-none shadow-lg shadow-teal-700/20 !rounded-xl active:scale-[0.99] transition-all cursor-pointer shrink-0">
             Tambah Pengguna Baru
         </flux:button>
     </div>
